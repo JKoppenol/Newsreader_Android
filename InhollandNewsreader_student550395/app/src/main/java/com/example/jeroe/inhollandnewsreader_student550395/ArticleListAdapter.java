@@ -28,6 +28,7 @@ public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.
     private final List<Article> mItems;
     private final Context mContext;
     private final ListItemClickListener mItemClickListener;
+    private final LayoutInflater layoutInflater;
 
     private SharedPreferences pref;
 
@@ -40,6 +41,8 @@ public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.
         mItems = items;
         mContext = context;
         mProgress = progress;
+
+        layoutInflater = LayoutInflater.from(context);
 
         this.mItemClickListener = (ListItemClickListener) context;
 
@@ -57,12 +60,17 @@ public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.
 
     @Override
     public ListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ListViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.listitem, parent, false));
+        View view = layoutInflater.inflate(R.layout.listitem, parent, false);
+        return new ListViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(ListViewHolder holder, final int position) {
         Article node = getItem(position);
+
+        holder.title.setText(node.Title);
+        holder.description.setText(node.Summary);
+        Glide.with(mContext).load(node.Image).centerCrop().crossFade().into(holder.image);
 
         final int clickedItem = holder.getAdapterPosition();
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -71,10 +79,6 @@ public class ArticleListAdapter extends RecyclerView.Adapter<ArticleListAdapter.
                 mItemClickListener.onItemClick(view, clickedItem);
             }
         });
-
-        holder.title.setText(node.Title);
-        holder.description.setText(node.Summary);
-        Glide.with(mContext).load(node.Image).centerCrop().crossFade().into(holder.image);
     }
 
     @Override
